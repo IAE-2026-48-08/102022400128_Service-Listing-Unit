@@ -29,6 +29,8 @@ services:
     depends_on:
       listing-unit-db:
         condition: service_healthy
+    networks:
+      - listing-unit-network
 
   listing-unit-db:
     image: mysql:8.0
@@ -47,6 +49,12 @@ services:
       interval: 10s
       timeout: 5s
       retries: 5
+    networks:
+      - listing-unit-network
+
+networks:
+  listing-unit-network:
+    driver: bridge
 
 volumes:
   listing_unit_db_data:

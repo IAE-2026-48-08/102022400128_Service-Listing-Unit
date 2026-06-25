@@ -1,5 +1,6 @@
 .git
 .env
+!.env.example
 vendor
 node_modules
 .phpunit.cache

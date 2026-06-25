@@ -9,14 +9,20 @@ COPY --from=composer:2 /usr/bin/composer /usr/bin/composer
 
 WORKDIR /var/www/html
 
-COPY composer.json ./
+COPY composer.json composer.lock ./
 RUN composer install --no-interaction --prefer-dist --no-dev --optimize-autoloader --no-scripts
 
 COPY . .
-RUN composer dump-autoload --optimize \
+
+# Create .env from .env.example so Laravel can read configuration
+# Pre-copy static openapi.json as fallback for Swagger UI
+RUN cp .env.example .env \
+    && composer dump-autoload --optimize \
     && mkdir -p storage/api-docs storage/framework/cache/data storage/framework/sessions storage/framework/views storage/logs bootstrap/cache \
-    && chmod -R 775 storage bootstrap/cache
+    && chmod -R 775 storage bootstrap/cache \
+    && cp docs/openapi.json storage/api-docs/api-docs.json
 
 EXPOSE 8001
 
-CMD ["sh", "-c", "php artisan l5-swagger:generate && php artisan migrate --seed --force && php artisan serve --host=0.0.0.0 --port=8001"]
+# Use || true for swagger generate so it doesn't block container startup if it fails
+CMD ["sh", "-c", "php artisan l5-swagger:generate || true && php artisan migrate --seed --force && php artisan serve --host=0.0.0.0 --port=8001"]

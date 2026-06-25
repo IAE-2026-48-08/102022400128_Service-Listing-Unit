@@ -42,7 +42,10 @@ return [
         ],
         'scanOptions' => [
             'default_processors_configuration' => [],
-            'analyser' => null,
+            'analyser' => new \OpenApi\Analysers\ReflectionAnalyser([
+                new \OpenApi\Analysers\AttributeAnnotationFactory(),
+                new \OpenApi\Analysers\DocBlockAnnotationFactory(),
+            ]),
             'analysis' => null,
             'processors' => [],
             'pattern' => null,
