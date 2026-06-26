@@ -23,7 +23,7 @@ class IaeIntegrationService
     public function getM2mToken(): string
     {
         return Cache::remember('iae_m2m_token', 55, function () {
-            $response = Http::post("{$this->baseUrl}/api/v1/auth/token", [
+            $response = Http::timeout(3)->post("{$this->baseUrl}/api/v1/auth/token", [
                 'api_key' => $this->apiKey,
             ]);
 
@@ -56,7 +56,7 @@ class IaeIntegrationService
 </soap:Envelope>
 XML;
 
-            $response = Http::withToken($token)
+            $response = Http::timeout(3)->withToken($token)
                 ->withBody($xml, 'application/xml')
                 ->post("{$this->baseUrl}/soap/v1/audit");
 
@@ -84,7 +84,7 @@ XML;
         try {
             $token = $this->getM2mToken();
 
-            $response = Http::withToken($token)
+            $response = Http::timeout(3)->withToken($token)
                 ->post("{$this->baseUrl}/api/v1/messages/publish", [
                     'topic' => $topic,
                     'payload' => $payload,

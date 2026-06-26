@@ -24,5 +24,4 @@ RUN cp .env.example .env \
 
 EXPOSE 8001
 
-# Use || true for swagger generate so it doesn't block container startup if it fails
-CMD ["sh", "-c", "php artisan l5-swagger:generate || true && php artisan migrate --seed --force && php artisan serve --host=0.0.0.0 --port=8001"]
+CMD ["sh", "-c", "if [ \"$DB_CONNECTION\" = \"mysql\" ]; then count=0; while ! mysqladmin ping -h \"$DB_HOST\" -u\"$DB_USERNAME\" -p\"$DB_PASSWORD\" --silent; do if [ $count -ge 30 ]; then echo 'Database not ready, proceeding anyway...'; break; fi; echo 'Waiting for database...'; sleep 1; count=$((count + 1)); done; fi && php artisan l5-swagger:generate || true && php artisan migrate --seed --force && php artisan serve --host=0.0.0.0 --port=8001"]

@@ -29,7 +29,7 @@ class EnsureSsoToken
 
             // Cache JWKS for 60 minutes to prevent hitting SSO server on every request
             $jwks = Cache::remember('sso_jwks', 3600, function () use ($jwksUrl) {
-                $response = Http::get($jwksUrl);
+                $response = Http::timeout(3)->get($jwksUrl);
                 if ($response->failed()) {
                     throw new Exception('Failed to fetch JWKS from SSO server');
                 }
