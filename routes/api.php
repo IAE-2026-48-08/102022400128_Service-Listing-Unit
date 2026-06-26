@@ -2,11 +2,10 @@
 
 use App\Http\Controllers\ListingController;
 use App\Http\Middleware\EnsureIaeApiKey;
-use App\Http\Middleware\EnsureSsoToken;
 use Illuminate\Support\Facades\Route;
 
 Route::prefix('v1')
-    ->middleware(EnsureSsoToken::class)
+    ->middleware(EnsureIaeApiKey::class)
     ->group(function (): void {
         Route::get('/listings', [ListingController::class, 'index']);
         Route::get('/listings/{id}', [ListingController::class, 'show'])->whereNumber('id');

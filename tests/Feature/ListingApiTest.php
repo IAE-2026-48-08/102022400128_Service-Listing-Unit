@@ -56,34 +56,20 @@ class ListingApiTest extends TestCase
             ->postJson('/api/v1/listings', ['status' => 'invalid'])
             ->assertUnprocessable()
             ->assertJsonPath('status', 'error');
+    }
 
-        $this->flushHeaders();
+    public function test_401_when_no_api_key(): void
+    {
+        // Test tanpa X-IAE-KEY → harus 401
         $this->getJson('/api/v1/listings')
             ->assertUnauthorized()
             ->assertJsonPath('status', 'error');
-    }
-
-    protected function setUp(): void
-    {
-        parent::setUp();
-
-        $this->app->bind(\App\Http\Middleware\EnsureSsoToken::class, function () {
-            return new class {
-                public function handle($request, $next) {
-                    if (! $request->bearerToken()) {
-                        return \App\Support\ApiResponse::error('Unauthorized: missing Bearer token', null, 401);
-                    }
-                    return $next($request);
-                }
-            };
-        });
     }
 
     private function headers(): array
     {
         return [
             'X-IAE-KEY' => '102022400128',
-            'Authorization' => 'Bearer mock-token',
         ];
     }
 

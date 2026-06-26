@@ -34,6 +34,18 @@ class GraphQlController extends Controller
             $variables = json_decode($variables, true) ?: [];
         }
 
+        // Handle GraphQL introspection queries (__schema, __type)
+        if (str_contains($query, '__schema') || str_contains($query, '__type')) {
+            return response()->json([
+                'data' => [
+                    '__schema' => [
+                        'types' => collect(self::ALLOWED_FIELDS)->map(fn ($f) => ['name' => $f])->values()->all(),
+                        'queryType' => ['name' => 'Query'],
+                    ],
+                ],
+            ]);
+        }
+
         if (! str_contains($query, 'unit')) {
             return ApiResponse::error('Only the unit(id: ID!) GraphQL query is available', null, 422);
         }
